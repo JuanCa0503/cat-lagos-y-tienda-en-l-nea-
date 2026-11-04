@@ -1,24 +1,15 @@
 import os
-import psycopg2
-from psycopg2 import OperationalError
+from supabase import create_client, Client
 
-def conectar_base_datos():
-    try:
-        # Render y servicios en la nube inyectan las credenciales vía variables de entorno
-        conexion = psycopg2.connect(
-            host=os.getenv("DB_HOST"),
-            database=os.getenv("DB_NAME"),
-            user=os.getenv("DB_USER"),
-            password=os.getenv("DB_PASSWORD"),
-            port=os.getenv("DB_PORT", "5432")
-        )
-        print("¡Conexión exitosa a la base de datos en Render!")
-        return conexion
-    except OperationalError as e:
-        print(f"Error al conectar a la base de datos: {e}")
-        return None
+# Lectura segura desde el entorno de Render
+url: str = os.getenv("https://cngsfkwkaodbopikrplm.supabase.co")
+key: str = os.getenv("sb_publishable_ZByXGOuhARBXw_0w_xbN3w_qld1NU2P")
 
-if __name__ == "__main__":
-    conn = conectar_base_datos()
-    if conn:
-        conn.close()
+if not url or not key:
+    raise ValueError("Las credenciales de Supabase no están configuradas en el entorno.")
+
+supabase: Client = create_client(url, key)
+
+# Ejemplo de prueba de conexión
+response = supabase.table("tu_tabla").select("*").limit(1).execute()
+print("Conexión exitosa:", response.data)
