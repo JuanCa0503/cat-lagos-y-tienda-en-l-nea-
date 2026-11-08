@@ -4,23 +4,21 @@ from supabase import create_client, Client
 
 app = Flask(__name__)
 
-# Configuración de Supabase utilizando variables de entorno
+# Configuración correcta de Supabase con respaldo directo
 url: str = os.environ.get("SUPABASE_URL", "https://cngsfkwkaodbopikrplm.supabase.co")
-key: str = os.environ.get("sb_publishable_ZByXGOuhARBXw_0w_xbN3w_qld1NU2P")
+key: str = os.environ.get("SUPABASE_KEY", "sb_publishable_ZByXGOuhARBXw_0w_xbN3w_qld1NU2P")
 
 supabase: Client = create_client(url, key)
 
 @app.route("/")
 def index():
     try:
-        # Consulta los datos de tu tabla en Supabase (ej. 'autopartes')
         response = supabase.table("autopartes").select("*").execute()
         autopartes = response.data
     except Exception as e:
         print(f"Error al obtener datos: {e}")
         autopartes = []
     
-    # Renderiza una plantilla o devuelve los datos en JSON
     return render_template("index.html", autopartes=autopartes)
 
 @app.route("/api/autopartes")
