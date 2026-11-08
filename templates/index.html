@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Catálogo de Autopartes</title>
+  <!-- Tailwind CSS para estilos rápidos -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- SDK oficial de Supabase desde CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body class="bg-gray-50 text-gray-900 font-sans min-h-screen">
+
+  <!-- Encabezado / Navbar -->
+  <header class="bg-slate-900 text-white shadow-md sticky top-0 z-50">
+    <div class="max-w-7xl mx-auto px-4 py-4 flex flex-col md:flex-row justify-between items-center gap-4">
+      <div class="flex items-center space-x-3">
+        <div class="bg-sky-500 p-2 rounded-lg text-white font-bold text-xl">🚗</div>
+        <h1 class="text-2xl font-bold tracking-wide">AutoPartes Express</h1>
+      </div>
+      
+      <!-- Buscador -->
+      <div class="w-full md:w-1/3">
+        <input 
+          type="text" 
+          id="search-input" 
+          placeholder="Buscar por nombre o SKU..." 
+          class="w-full px-4 py-2 rounded-lg text-gray-800 focus:outline-none focus:ring-2 focus:ring-sky-400 text-sm"
+        >
+      </div>
+
+      <!-- Botón para abrir modal de nuevo registro -->
+      <button 
+        onclick="toggleModal(true)"
+        class="bg-sky-600 hover:bg-sky-500 text-white px-4 py-2 rounded-lg font-medium text-sm transition shadow"
+      >
+        + Nueva Autoparte
+      </button>
+    </div>
+  </header>
+
+  <!-- Contenido Principal -->
+  <main class="max-w-7xl mx-auto px-4 py-8">
+    
+    <!-- Barra de Filtros de Categoría -->
+    <div class="flex items-center justify-between mb-6 flex-wrap gap-4 border-b pb-4">
+      <h2 class="text-xl font-semibold text-slate-800">Catálogo de Productos</h2>
+      <select 
+        id="category-filter" 
+        class="bg-white border border-gray-300 text-gray-700 text-sm rounded-lg p-2.5 focus:ring-sky-500 focus:border-sky-500"
+      >
+        <option value="TODAS">Todas las categorías</option>
+        <option value="Filtros">Filtros</option>
+        <option value="Frenos">Frenos</option>
+        <option value="Encendido">Encendido</option>
+        <option value="Suspensión">Suspensión</option>
+        <option value="Aceites y Fluidos">Aceites y Fluidos</option>
+        <option value="Motor">Motor</option>
+        <option value="Sistema Eléctrico">Sistema Eléctrico</option>
+      </select>
+    </div>
+
+    <!-- Grid donde se mostrarán los artículos -->
+    <div id="products-grid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+      <div class="col-span-full text-center py-12 text-gray-500">
+        Cargando artículos desde Supabase...
+      </div>
+    </div>
+  </main>
+
+  <!-- Modal para Agregar Autoparte -->
+  <div id="add-modal" class="fixed inset-0 bg-black/50 hidden backdrop-blur-sm z-50 flex items-center justify-center p-4">
+    <div class="bg-white rounded-xl shadow-xl max-w-md w-full p-6 relative">
+      <h3 class="text-lg font-bold text-slate-900 mb-4">Agregar Nueva Autoparte</h3>
+      
+      <form id="part-form" class="space-y-4">
+        <div>
+          <label class="block text-xs font-semibold text-gray-600 uppercase mb-1">SKU *</label>
+          <input type="text" id="sku" required placeholder="Ej. FIL-ACE-001" class="w-full border p-2 rounded text-sm focus:ring-2 focus:ring-sky-500 outline-none">
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-gray-600 uppercase mb-1">Nombre *</label>
+          <input type="text" id="nombre" required placeholder="Ej. Filtro de Aceite" class="w-full border p-2 rounded text-sm focus:ring-2 focus:ring-sky-500 outline-none">
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-gray-600 uppercase mb-1">Categoría *</label>
+          <select id="categoria" required class="w-full border p-2 rounded text-sm focus:ring-2 focus:ring-sky-500 outline-none bg-white">
+            <option value="Filtros">Filtros</option>
+            <option value="Frenos">Frenos</option>
+            <option value="Encendido">Encendido</option>
+            <option value="Suspensión">Suspensión</option>
+            <option value="Aceites y Fluidos">Aceites y Fluidos</option>
+            <option value="Motor">Motor</option>
+            <option value="Sistema Eléctrico">Sistema Eléctrico</option>
+          </select>
+        </div>
+        <div class="grid grid-cols-2 gap-4">
+          <div>
+            <label class="block text-xs font-semibold text-gray-600 uppercase mb-1">Precio ($) *</label>
+            <input type="number" step="0.01" id="precio" required placeholder="250.00" class="w-full border p-2 rounded text-sm focus:ring-2 focus:ring-sky-500 outline-none">
+          </div>
+          <div>
+            <label class="block text-xs font-semibold text-gray-600 uppercase mb-1">Stock *</label>
+            <input type="number" id="stock" required placeholder="10" class="w-full border p-2 rounded text-sm focus:ring-2 focus:ring-sky-500 outline-none">
+          </div>
+        </div>
+
+        <div class="flex justify-end gap-2 pt-4">
+          <button type="button" onclick="toggleModal(false)" class="px-4 py-2 border rounded text-sm text-gray-600 hover:bg-gray-100">Cancelar</button>
+          <button type="submit" class="px-4 py-2 bg-sky-600 hover:bg-sky-500 text-white rounded text-sm font-medium">Guardar</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
