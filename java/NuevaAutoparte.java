@@ -7,8 +7,8 @@ import java.util.Locale;
 public class NuevaAutoparte {
 
     // Reemplaza con tus datos de Supabase (Settings > API)
-    private static final String SUPABASE_URL = "https://TU_PROYECTO.supabase.co";
-    private static final String SUPABASE_API_KEY = "TU_ANON_KEY_DE_SUPABASE";
+    private static final String SUPABASE_URL = "https://cngsfkwkaodbopikrplm.supabase.co";
+    private static final String SUPABASE_API_KEY = "sb_publishable_ZByXGOuhARBXw_0w_xbN3w_qld1NU2P";
 
     private static String escaparJson(String texto) {
         if (texto == null) return "";
