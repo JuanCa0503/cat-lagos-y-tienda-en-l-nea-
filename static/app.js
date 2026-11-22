@@ -3,29 +3,31 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const searchInput = document.getElementById("search-input");
     const categoryFilter = document.getElementById("category-filter");
-    const formNuevaAutoparte = document.getElementById("nueva-autoparte-form");
+    const partForm = document.getElementById("part-form");
 
     if (searchInput) searchInput.addEventListener("input", filtrarProductos);
     if (categoryFilter) categoryFilter.addEventListener("change", filtrarProductos);
-    if (formNuevaAutoparte) formNuevaAutoparte.addEventListener("submit", guardarNuevaAutoparte);
+    if (partForm) partForm.addEventListener("submit", guardarNuevaAutoparte);
 });
 
 let todasLasAutopartes = [];
 
-function toggleModal() {
-    const modal = document.getElementById("modal-nueva-autoparte");
-    if (!modal) {
-        console.warn("No se encontró el elemento con id 'modal-nueva-autoparte' en el HTML.");
-        return;
+function toggleModal(mostrar) {
+    const modal = document.getElementById("add-modal");
+    if (!modal) return;
+
+    if (typeof mostrar === "boolean") {
+        modal.classList.toggle("hidden", !mostrar);
+    } else {
+        modal.classList.toggle("hidden");
     }
-    modal.classList.toggle("hidden");
 }
 
 async function guardarNuevaAutoparte(event) {
     event.preventDefault();
 
     const payload = {
-        codigo_sku: document.getElementById("codigo_sku")?.value.trim(),
+        codigo_sku: document.getElementById("sku")?.value.trim(),
         nombre: document.getElementById("nombre")?.value.trim(),
         categoria: document.getElementById("categoria")?.value.trim(),
         precio: Number(document.getElementById("precio")?.value),
@@ -47,7 +49,7 @@ async function guardarNuevaAutoparte(event) {
         }
 
         event.target.reset();
-        toggleModal();
+        toggleModal(false);
         await cargarAutopartes();
     } catch (error) {
         alert("No se pudo enviar la autoparte: " + error.message);
