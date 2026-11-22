@@ -3,19 +3,63 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const searchInput = document.getElementById("search-input");
     const categoryFilter = document.getElementById("category-filter");
+    const formNuevaAutoparte = document.getElementById("nueva-autoparte-form");
 
     if (searchInput) searchInput.addEventListener("input", filtrarProductos);
     if (categoryFilter) categoryFilter.addEventListener("change", filtrarProductos);
+    if (formNuevaAutoparte) formNuevaAutoparte.addEventListener("submit", guardarNuevaAutoparte);
 });
 
 let todasLasAutopartes = [];
+
+function toggleModal() {
+    const modal = document.getElementById("modal-nueva-autoparte");
+    if (!modal) {
+        console.warn("No se encontró el elemento con id 'modal-nueva-autoparte' en el HTML.");
+        return;
+    }
+    modal.classList.toggle("hidden");
+}
+
+async function guardarNuevaAutoparte(event) {
+    event.preventDefault();
+
+    const payload = {
+        codigo_sku: document.getElementById("codigo_sku")?.value.trim(),
+        nombre: document.getElementById("nombre")?.value.trim(),
+        categoria: document.getElementById("categoria")?.value.trim(),
+        precio: Number(document.getElementById("precio")?.value),
+        stock: Number(document.getElementById("stock")?.value)
+    };
+
+    try {
+        const response = await fetch("/api/autopartes", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(payload)
+        });
+
+        const data = await response.json().catch(() => ({}));
+
+        if (!response.ok || data.error) {
+            alert("Error al guardar: " + (data.error || `HTTP ${response.status}`));
+            return;
+        }
+
+        event.target.reset();
+        toggleModal();
+        await cargarAutopartes();
+    } catch (error) {
+        alert("No se pudo enviar la autoparte: " + error.message);
+    }
+}
 
 async function cargarAutopartes() {
     const grid = document.getElementById("products-grid");
     try {
         const response = await fetch("/api/autopartes");
         const data = await response.json();
-        
+
         if (data.error) {
             grid.innerHTML = `<div class="col-span-full text-center py-12 text-red-500">Error: ${data.error}</div>`;
             return;
